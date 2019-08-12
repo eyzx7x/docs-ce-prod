@@ -2,21 +2,12 @@
 # Clustering for HA
 
 ## Introduction
-Many organizations need to cluster their Gluu Server in order to provide failover and high availability (HA). 
+The tutorial below offers detailed steps for configuring high availability (HA) across multiple instances of the Gluu Server. 
 
-The instructions below provide detailed steps for manually configuring HA across multuple instances of the Gluu Server. Although we provide instructions, clustering for production scenarios is not a simple task, and is **outside the scope** of free community support.  
-
-Instead, we offer two alternative supported strategies for HA, both of which require a [Gluu VIP Subscription](https://gluu.org/pricing/#vip) *or* a support agreement with one of our OEM partners. 
-
-1. [Cluster Manager (CM)](https://gluu.org/docs/cm), our GUI tool for automating many of the complicated steps below. 
-
-1. [Docker Edition (DE)](https://gluu.org/docs/de), which provides assets, recipes, and examples for running all Gluu Services in their own Linux containers. DE not only enables HA, but also provides operational, performance, and security advantages over traditional VM-based deployments of Gluu.
-
-For more details about supported options for HA, [schedule a call](https://gluu.org/booking). 
+Clustering for production scenarios is not a simple task. Individual environments should *always* be benchmarked, tested, and documented in order to ensure organizational requirements for uptime are met. 
 
 ## Concept
-
-Clustering uses OpenDJ replication and configuration changes to greatly improve Gluu Server availability, via a proxy.
+The web tier of the Gluu Server (i.e. oxAuth) is stateless and can be scaled horizontally. The local LDAP server included in all Gluu Server deployments (i.e. Gluu LDAP) supports multi-master replication (MMR). Any instance can be written to and changes are propagated to other instances.
 
 ![cluster manager diagram](../img/cluster/cluster-manager-diagram.png)
 
@@ -49,8 +40,6 @@ All server nodes will have the same hostname
 Some prerequisites are necessary for setting up Gluu with delta-syncrepl MMR:   
 
 - A minimum of four (4) servers or VMs: two (2) for Gluu Servers, one (1) for load balancing (in our example, NGINX), and one for redis.
-
-- A separate NGINX server is necessary because replicating a Gluu server to a different hostname breaks the functionality of the Gluu web page when using a hostname other than what is in the certificates. For example, if you use cluster.example.com as the host and copy that to a second server (e.g. 138.197.65.243), the process of accessing the site on cluster.example.com, even with replication, will fail authentication due to a hostname conflict. So if node 1 fails, you won't be able to use Gluu Server effectively.
 
 - To create the following instructions we used Ubuntu 16.04 ( Ubuntu 18.04 is supported)     
 
@@ -898,3 +887,6 @@ service gluu-server-3.1.6 restart
 ```
 
 - Now, the administrator web UI and oxAuth have some failover redundancy. There is obviously more configuration necessary on the network layer of the topology for true HA failover, but that is outside of the scope of this documentation.          
+
+## Support
+Clustering is outside the scope of free community support. For more details about supported options for HA, [schedule a call](https://gluu.org/booking). 

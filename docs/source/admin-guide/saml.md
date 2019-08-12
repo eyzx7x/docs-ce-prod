@@ -82,6 +82,7 @@ The Gluu Server supports force authentication out-of-the-box. Including `ForceAu
 Upon receiving the SAML request with this flag, the IDP will invalidate its session for the user, then will issue a new OpenID Connect (OIDC) authorization request to oxAuth, including the `prompt=login` parameter. This parameter forces oxAuth to invalidate its session as well. The user will then follow the full authentication procedure.
 
 ## Create a Trust Relationship
+
 Follow these instructions to create a SAML TR in your Gluu Server: 
 
 1. Go to `SAML` > `Trust Relationships`    
@@ -105,6 +106,19 @@ A description of each field follows:
 - **Released**: The SPs required attributes must be added to this panel. The required attributes can be selected from the menu on the left with the heading “Release Additional Attributes”.     
     
 The Trust Relationship (TR) can be added by clicking the `Add` button located in the lower left side of the page.     
+
+## IDP-initiated outbound SAML flow
+
+A regular outbound SAML flow starts at an SP. The user is redirected to an IDP with a SAML request, and is then sent by the IDP to the ACS endpoint of the SP with a SAML response. A shortened version of this flow is called "IDP-initiated" (or "unsolicited" in Shibboleth's documentation). It starts with the IDP sending a SAML response to the SP, when no prior SAML request was made.
+
+The Gluu Server is configured to support this SAML flow out-of-the-box. To employ it, follow these steps:
+
+1. Add a TR for the SP using the standard procedure described [above](#create-a-trust-relationship). Wait until the updated configuration is re-loaded by the IDP.   
+1. Craft a URL like this: `https://idp.gluu.host.loc/idp/profile/SAML2/Unsolicited/SSO?providerId=https%3A%2F%2Fsphost-shib.site%3a8443%2Fshibboleth`, where: 
+    1. `idp.gluu.host.loc` is the DNS name of the target Gluu Server   
+    1. `providerId` URL query parameter contains `entityid` of the target SP   
+1. Send the user to the composed URL (e.g. via redirection by on-page JS, an action triggered by a button, etc.)
+
 
 ## Relying Party Configuration     
 Through the Relying Party configuration you can customize how different IDP profiles will respond to requests received from the SP, including encryption and digital signature options. The underlying IDPs functionality is described in [the Shibboleth wiki](https://wiki.shibboleth.net/confluence/display/IDP30/RelyingPartyConfiguration).  
